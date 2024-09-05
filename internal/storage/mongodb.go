@@ -2,9 +2,7 @@ package storage
 
 import (
 	"context"
-	"log/slog"
 
-	"github.com/rombintu/checker-sprints/lib/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -46,7 +44,7 @@ func NewMongoDBDriver(path string, database string) *mongodbDriver {
 func (d *mongodbDriver) Open() error {
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(d.URI))
 	if err != nil {
-		logger.Log.Error("Failed to connect to MongoDB", slog.Any("error", err))
+		// logger.Log.Error("Failed to connect to MongoDB", slog.Any("error", err))
 	}
 	d.Client = client
 	return nil

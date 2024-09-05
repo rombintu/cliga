@@ -6,7 +6,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/rombintu/checker-sprints/internal/storage"
-	"github.com/rombintu/checker-sprints/lib/logger"
 )
 
 type StorageConfig struct {
@@ -14,9 +13,10 @@ type StorageConfig struct {
 	ConnectionString string
 }
 
-type ApiConfig struct {
+type ServerConfig struct {
 	Driver  string
 	Storage StorageConfig
+	Listen  string
 }
 
 func tryGetEnv(key string, or string) string {
@@ -27,16 +27,17 @@ func tryGetEnv(key string, or string) string {
 	return value
 }
 
-func NewApiConfig() ApiConfig {
+func NewServerConfig() ServerConfig {
 	if err := godotenv.Load(); err != nil {
-		logger.Log.Error("ENV file not loaded", slog.Any("error", err))
+		slog.Error("env file not loaded", slog.Any("error", err))
 	}
 
-	return ApiConfig{
+	return ServerConfig{
 		Driver: tryGetEnv("DRIVER", storage.MemDriverName),
 		Storage: StorageConfig{
 			ConnectionString: tryGetEnv("CONNECTION", ""),
 			Database:         tryGetEnv("DATABASE", "main"),
 		},
+		Listen: tryGetEnv("ADDRESS", "localhost:8080"),
 	}
 }
