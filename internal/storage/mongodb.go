@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"log/slog"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,10 +12,12 @@ import (
 
 const (
 	defaultSprintsCollectionName = "sprints"
+	defaultUsersCollectionName   = "users"
 )
 
 type Collections struct {
 	Sprints string
+	Users   string
 }
 
 type Databases struct {
@@ -42,9 +46,10 @@ func NewMongoDBDriver(path string, database string) *mongodbDriver {
 }
 
 func (d *mongodbDriver) Open() error {
+	slog.Debug("try connect to database", slog.String("path", d.URI))
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(d.URI))
 	if err != nil {
-		// logger.Log.Error("Failed to connect to MongoDB", slog.Any("error", err))
+		slog.Error("Failed to connect to MongoDB", slog.Any("error", err))
 	}
 	d.Client = client
 	return nil
@@ -60,17 +65,27 @@ func (d *mongodbDriver) Close() error {
 
 type row interface{}
 
-func (d *mongodbDriver) FetchOne(id int) (row, error) {
+func (d *mongodbDriver) FetchSprint(id int) (jsonData Sprint, err error) {
 	sprints := d.ConnSprints()
 	var result bson.M
-	var err error
-	err = sprints.FindOne(context.Background(), bson.D{{"id", id}}).Decode(&result)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err = sprints.FindOne(
+		ctx,
+		bson.M{"id": id},
+	).Decode(&result)
 	if err == mongo.ErrNoDocuments {
-		return result, err
+		return jsonData, err
 	} else if err != nil {
-		return result, err
+		return jsonData, err
 	}
-	return result, err
+	binData, err := bson.Marshal(result)
+	if err != nil {
+		return jsonData, err
+	}
+	err = bson.Unmarshal(binData, &jsonData)
+	return jsonData, err
 }
 
 func (d *mongodbDriver) InsertOne() (row, error) {
