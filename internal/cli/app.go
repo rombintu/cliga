@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/rombintu/checker-sprints/internal/storage"
 	"github.com/urfave/cli/v2"
 )
 
@@ -25,40 +26,61 @@ const (
 	ColorCyan   = "\033[36m"
 )
 
-func PrintAgent(text string) {
+func printAgent(text string) {
 	fmt.Printf("["+ColorPurple+"Agent"+ColorReset+"]: %s\n", text)
 }
 
-func PrintServer(text string) {
+func printServer(text string) {
 	fmt.Printf("["+ColorGreen+"Server"+ColorReset+"]: %s\n", text)
 }
 
-func PrintExit() {
-	PrintAgent("Exit")
+func printExit() {
+	printAgent("Exit")
 	os.Exit(0)
 }
 
-func PrintWaiting() {
-	PrintAgent("Waiting...")
+func printWaiting() {
+	printAgent("Waiting...")
 }
 
-func PrintServerError(text string, err error, debug bool) {
-	PrintServer(ColorRed + text + ColorReset)
+func printServerError(text string, err error, debug bool) {
+	printServer(ColorRed + text + ColorReset)
 	if debug {
 		slog.Error(err.Error())
 	}
-	PrintExit()
+	printExit()
 }
 
-func PrintAgentError(text string, err error, debug bool) {
-	PrintAgent(ColorRed + text + ColorReset)
+func printAgentError(text string, err error, debug bool) {
+	printAgent(ColorRed + text + ColorReset)
 	if debug {
 		slog.Error(err.Error())
 	}
-	PrintExit()
+	printExit()
+}
+
+func prettyTitle(text string) string {
+	return ColorBlue + text + ColorReset
+}
+
+func prettyInfo(text string) string {
+	return ColorCyan + text + ColorReset
+}
+
+func printSprint(s *storage.Sprint) {
+	printAgent(
+		fmt.Sprintf("Sprint %d. %s", s.ID, prettyTitle(s.Title)))
+	for _, step := range s.GetSteps() {
+		if step.Body == "" {
+			continue
+		}
+		printAgent(
+			fmt.Sprintf("%d. %s", step.ID, step.Body))
+	}
 }
 
 func NewApp() *AgentCli {
+	SprintsInit()
 	return &AgentCli{
 		App: &cli.App{
 			Name:  "cliga",
@@ -92,14 +114,14 @@ func (c *AgentCli) Init() {
 		Action: func(ctx *cli.Context) error {
 			sprintNum := ctx.Args().First()
 			if sprintNum == "" {
-				PrintAgent("The sprint number should not be empty")
-				PrintExit()
+				printAgent("The sprint number should not be empty")
+				printExit()
 				return nil
 			}
-			PrintWaiting()
+			printWaiting()
 			// TODO
 			c.ActionSprintGet(ctx, sprintNum)
-			PrintExit()
+			printExit()
 			return nil
 		},
 	}
@@ -114,14 +136,14 @@ func (c *AgentCli) Init() {
 
 			uuid := ctx.Args().First()
 			if uuid == "" {
-				PrintAgent("The uuid should not be empty")
-				PrintExit()
+				printAgent("The uuid should not be empty")
+				printExit()
 				return nil
 			}
-			PrintWaiting()
+			printWaiting()
 			// TODO
-
-			PrintExit()
+			// c.ActionUserGet(ctx, uuid)
+			printExit()
 			return nil
 		},
 	}
@@ -138,18 +160,23 @@ func (c *AgentCli) Init() {
 		Name:  "check",
 		Usage: "Check [number sprint]",
 		Args:  true,
-		Flags: defaultFlagsForServer,
+		Flags: append(defaultFlagsForServer, &cli.StringFlag{
+			Name:     "user",
+			Aliases:  []string{"u", "username"},
+			Usage:    "Concatinate first letter of firstname and full lastname. Ex: iivanov",
+			Required: true,
+		}),
 		Action: func(ctx *cli.Context) error {
 			sprintNum := ctx.Args().First()
 			if sprintNum == "" {
-				PrintAgentError("The sprint number should not be empty", nil, ctx.Bool("debug"))
-				PrintExit()
+				printAgentError("The sprint number should not be empty", nil, ctx.Bool("debug"))
+				printExit()
 				return nil
 			}
-			PrintWaiting()
+			printWaiting()
 			// TODO
-
-			PrintExit()
+			c.ActionSprintCheck(ctx, sprintNum)
+			printExit()
 			return nil
 		},
 	}
