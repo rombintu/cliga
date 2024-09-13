@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -17,6 +18,8 @@ const (
 	jsonHeader    string = "application/json"
 	machineIDPath string = "/etc/machine-id"
 )
+
+var errNone = errors.New("none")
 
 type Url struct {
 	path string
@@ -108,7 +111,7 @@ func (c *AgentCli) ActionSprintGet(ctx *cli.Context, sprintNum string) {
 	case "2", "two", "second", "fs":
 		printSprint(sprintFS)
 	default:
-		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), nil, false)
+		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
 }
 

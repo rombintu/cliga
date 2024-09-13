@@ -3,9 +3,7 @@ package storage
 import (
 	"context"
 	"log/slog"
-	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -65,28 +63,28 @@ func (d *mongodbDriver) Close() error {
 
 type row interface{}
 
-func (d *mongodbDriver) FetchSprint(id int) (jsonData Sprint, err error) {
-	sprints := d.ConnSprints()
-	var result bson.M
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+// func (d *mongodbDriver) FetchSprint(id int) (jsonData Sprint, err error) {
+// 	sprints := d.ConnSprints()
+// 	var result bson.M
+// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+// 	defer cancel()
 
-	err = sprints.FindOne(
-		ctx,
-		bson.M{"id": id},
-	).Decode(&result)
-	if err == mongo.ErrNoDocuments {
-		return jsonData, err
-	} else if err != nil {
-		return jsonData, err
-	}
-	binData, err := bson.Marshal(result)
-	if err != nil {
-		return jsonData, err
-	}
-	err = bson.Unmarshal(binData, &jsonData)
-	return jsonData, err
-}
+// 	err = sprints.FindOne(
+// 		ctx,
+// 		bson.M{"id": id},
+// 	).Decode(&result)
+// 	if err == mongo.ErrNoDocuments {
+// 		return jsonData, err
+// 	} else if err != nil {
+// 		return jsonData, err
+// 	}
+// 	binData, err := bson.Marshal(result)
+// 	if err != nil {
+// 		return jsonData, err
+// 	}
+// 	err = bson.Unmarshal(binData, &jsonData)
+// 	return jsonData, err
+// }
 
 func (d *mongodbDriver) InsertOne() (row, error) {
 	return "", nil

@@ -9,7 +9,7 @@ type Storage interface {
 	Open() error
 	Close() error
 
-	FetchSprint(id int) (Sprint, error)
+	// FetchSprint(id int) (Sprint, error)
 	InsertOne() (row, error)
 }
 
