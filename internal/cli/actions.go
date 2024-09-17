@@ -26,6 +26,7 @@ type Url struct {
 }
 
 func NewUrl(base string) *Url {
+	printWaiting()
 	return &Url{path: base}
 }
 
@@ -58,21 +59,21 @@ func (u *Url) Get() (string, error) {
 	return string(body), nil
 }
 
-func (u *Url) Post(payload storage.User) (string, error) {
+func (u *Url) Post(payload storage.User) (string, int, error) {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(payload); err != nil {
-		return "Marshal payload error", err
+		return "Marshal payload error", 0, err
 	}
 	resp, err := http.Post(u.path, jsonHeader, &buf)
 	if err != nil {
-		return "No connect to server", err
+		return "No connect to server", 0, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "No response from server", err
+		return "No response from server", 0, err
 	}
-	return string(body), nil
+	return string(body), resp.StatusCode, nil
 }
 
 func getMachineID() (string, error) {
@@ -122,18 +123,41 @@ func (c *AgentCli) ActionSprintCheck(ctx *cli.Context, sprintNum string) {
 		printAgentError("Not found machine-id", err, debug)
 	}
 	user := storage.User{
-		Name:   ctx.String("user"),
+		Login:  ctx.String("user"),
 		Anchor: uniqObject,
 	}
 
-	printAgent(prettyInfo(fmt.Sprintf("Username: %s [%s]", user.Name, user.Anchor)))
+	printAgent(prettyInfo(fmt.Sprintf("Username: %s [%s]", user.Login, user.Anchor)))
+	// sch := storage.NewModelSprints()
+	var s *Sprint
+	switch sprintNum {
+	case "1", "one", "first", "vpn":
+		s = sprintVPN
+	case "2", "two", "second", "fs":
+		s = sprintFS
+	default:
+		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
+	}
 
+	stepsOK := true
+	for _, step := range s.Steps {
+		if !step.Check() {
+			stepsOK = false
+			printAgent(fmt.Sprintf("Taks [%d] in the Sprint [%d] are not solved", step.ID, s.ID))
+		}
+	}
+	if !stepsOK {
+		printAgentError("Some tasks are not solved, completion of the verification process", errNone, false)
+	}
+	printAgent(fmt.Sprintf("%sAll the tasks in the Sprint [%d] are solved!%s", ColorGreen, s.ID, ColorReset))
+	user.Sprints = []int64{s.ID}
 	url := NewUrl(ctx.String("server"))
-	url.addRoute("/users")
-	url.addQueryParam(sprintNum)
-	a, err := url.Get()
+	url.addRoute("/users/sprint")
+	a, code, err := url.Post(user)
 	if err != nil {
 		printServerError(a, err, ctx.Bool("debug"))
+	} else if code > 200 {
+		printServerError(a, errNone, false)
 	}
 	printServer(a)
 }

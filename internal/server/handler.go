@@ -1,8 +1,10 @@
 package server
 
 import (
+	"context"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -31,15 +33,18 @@ func (s *Server) Configure() {
 }
 
 func (s *Server) ConfigureStore() {
-	if err := s.store.Open(); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := s.store.Open(ctx); err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
+	s.store.Close(ctx)
 }
 
 func (s *Server) configureRouter() {
 	s.router.GET("/", s.pingHandler)
-	// s.router.GET("/sprints/:id", s.sprintsHandler)
+	s.router.POST("/users/sprint", s.userUpdateHandler)
 }
 
 func (s *Server) configureLogger() {

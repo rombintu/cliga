@@ -1,16 +1,18 @@
 package storage
 
+import "context"
+
 const (
 	MemDriverName     = "mem"
 	MongodbDriverName = "mongodb"
 )
 
 type Storage interface {
-	Open() error
-	Close() error
+	Open(ctx context.Context) error
+	Close(ctx context.Context) error
 
-	// FetchSprint(id int) (Sprint, error)
-	InsertOne() (row, error)
+	UserFetch(login string) (User, error)
+	UserUpsert(user User) error
 }
 
 func NewStorage(driver string, path string, database string) Storage {

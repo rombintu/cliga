@@ -6,7 +6,6 @@ import (
 
 type AgentCli struct {
 	*cli.App
-	// cache storage.FileStorage
 }
 
 func NewApp() *AgentCli {
@@ -22,7 +21,6 @@ func NewApp() *AgentCli {
 				},
 			},
 		},
-		// storage, // TODO
 	}
 }
 
@@ -48,8 +46,6 @@ func (c *AgentCli) Init() {
 				printExit()
 				return nil
 			}
-			printWaiting()
-			// TODO
 			c.ActionSprintGet(ctx, sprintNum)
 			printExit()
 			return nil
@@ -70,7 +66,6 @@ func (c *AgentCli) Init() {
 				printExit()
 				return nil
 			}
-			printWaiting()
 			// TODO
 			// c.ActionUserGet(ctx, uuid)
 			printExit()
@@ -93,7 +88,7 @@ func (c *AgentCli) Init() {
 		Flags: append(defaultFlagsForServer, &cli.StringFlag{
 			Name:     "user",
 			Aliases:  []string{"u", "username"},
-			Usage:    "Concatinate first letter of firstname and full lastname. Ex: iivanov",
+			Usage:    "Concatinate first letter of firstname and full lastname. ex: iivanov",
 			Required: true,
 		}),
 		Action: func(ctx *cli.Context) error {
@@ -103,7 +98,6 @@ func (c *AgentCli) Init() {
 				printExit()
 				return nil
 			}
-			printWaiting()
 			// TODO
 			c.ActionSprintCheck(ctx, sprintNum)
 			printExit()

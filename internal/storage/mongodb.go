@@ -3,7 +3,9 @@ package storage
 import (
 	"context"
 	"log/slog"
+	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -43,9 +45,9 @@ func NewMongoDBDriver(path string, database string) *mongodbDriver {
 	}
 }
 
-func (d *mongodbDriver) Open() error {
+func (d *mongodbDriver) Open(ctx context.Context) error {
 	slog.Debug("try connect to database", slog.String("path", d.URI))
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(d.URI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(d.URI))
 	if err != nil {
 		slog.Error("Failed to connect to MongoDB", slog.Any("error", err))
 	}
@@ -57,8 +59,12 @@ func (d *mongodbDriver) ConnSprints() *mongo.Collection {
 	return d.Client.Database(d.Meta.Databases.Main).Collection(d.Meta.Collections.Sprints)
 }
 
-func (d *mongodbDriver) Close() error {
-	return d.Client.Disconnect(context.Background())
+func (d *mongodbDriver) ConnUsers() *mongo.Collection {
+	return d.Client.Database(d.Meta.Databases.Main).Collection(d.Meta.Collections.Users)
+}
+
+func (d *mongodbDriver) Close(ctx context.Context) error {
+	return d.Client.Disconnect(ctx)
 }
 
 type row interface{}
@@ -86,6 +92,37 @@ type row interface{}
 // 	return jsonData, err
 // }
 
-func (d *mongodbDriver) InsertOne() (row, error) {
-	return "", nil
+func (d *mongodbDriver) UserFetch(login string) (User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	d.Open(ctx)
+	defer d.Close(ctx)
+	filter := bson.M{"login": login}
+	users := d.ConnUsers()
+	var result User
+	if err := users.FindOne(
+		ctx, filter,
+	).Decode(result); err != nil {
+		return User{}, err
+	}
+	return result, nil
+}
+
+func (d *mongodbDriver) UserUpsert(user User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	d.Open(ctx)
+	defer d.Close(ctx)
+	filter := bson.M{"login": user.Login}
+
+	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)
+	users := d.ConnUsers()
+
+	users.FindOneAndUpdate(
+		ctx,
+		filter,
+		bson.M{"$setOnInsert": user},
+		opts,
+	)
+	return nil
 }

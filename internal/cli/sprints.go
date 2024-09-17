@@ -14,6 +14,7 @@ type Sprint struct {
 	ID    int64  `json:"id"`
 	Title string `json:"title"`
 	Steps []Step `json:"steps"`
+	data  map[string]string
 }
 
 func True() bool {
@@ -28,6 +29,7 @@ func NewSprint(id int64, title string) *Sprint {
 	return &Sprint{
 		ID:    id,
 		Title: title,
+		data:  make(map[string]string),
 	}
 }
 

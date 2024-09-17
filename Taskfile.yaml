@@ -1,5 +1,6 @@
 version: '3'
+
 tasks:
-  build:
+  build-agent:
     cmds:
     - ""
