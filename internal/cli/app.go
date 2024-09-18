@@ -55,7 +55,7 @@ func (c *AgentCli) Init() {
 	var subUser = cli.Command{
 		Name:    "user",
 		Aliases: []string{"u"},
-		Usage:   "Get user sprints by [uuid]",
+		Usage:   "Get user results by [uuid]",
 		Args:    true,
 		Flags:   defaultFlagsForServer,
 		Action: func(ctx *cli.Context) error {
@@ -75,7 +75,7 @@ func (c *AgentCli) Init() {
 
 	var getCommand = cli.Command{
 		Name:  "get",
-		Usage: "Get [payload] from server",
+		Usage: "Get [something]",
 		Subcommands: []*cli.Command{
 			&subSprint, &subUser,
 		},
