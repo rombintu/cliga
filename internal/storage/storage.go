@@ -1,26 +1,28 @@
 package storage
 
-import "context"
-
 const (
 	MemDriverName     = "mem"
 	MongodbDriverName = "mongodb"
 )
 
-type Storage interface {
-	Open(ctx context.Context) error
-	Close(ctx context.Context) error
-
-	UserFetch(login string) (User, error)
-	UserUpsert(user User) error
+func NewStorage(driver string, path string, database string) *MongodbDriver {
+	return NewMongoDBDriver(path, database)
 }
 
-func NewStorage(driver string, path string, database string) Storage {
-	switch driver {
-	case MongodbDriverName:
-		return NewMongoDBDriver(path, database)
-	default:
-		return nil
-		// return NewMemDriver()
-	}
-}
+// type Storage interface {
+// 	Open(ctx context.Context) error
+// 	Close(ctx context.Context) error
+
+// 	UserFetch(login string) (User, error)
+// 	User(user User) error
+// }
+
+// func NewStorage(driver string, path string, database string) Storage {
+// 	switch driver {
+// 	case MongodbDriverName:
+// 		return NewMongoDBDriver(path, database)
+// 	default:
+// 		return nil
+// 		// return NewMemDriver()
+// 	}
+// }

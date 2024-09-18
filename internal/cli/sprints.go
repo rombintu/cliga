@@ -5,9 +5,9 @@ import (
 )
 
 type Step struct {
-	ID    int    `json:"id"`
-	Body  string `json:"body"`
-	Check func() bool
+	ID    int         `json:"id"`
+	Body  string      `json:"body"`
+	Check func() bool `json:"-"`
 }
 
 type Sprint struct {
@@ -58,30 +58,30 @@ func printSprint(s *Sprint) {
 }
 
 // Sprint first (1)
-var sprintVPN = NewSprint(1, "Настрока VPN")
+var SprintVPN = NewSprint(1, "Настрока VPN")
 
 // Sprint second (2)
-var sprintFS = NewSprint(2, "Базовое окружение и структура файловой системы Linux")
+var SprintFS = NewSprint(2, "Базовое окружение и структура файловой системы Linux")
 
 func SprintsInit() {
-	sprintVPN.AddStep(Step{
+	SprintVPN.AddStep(Step{
 		ID:    1,
 		Body:  "Если вы видите это сообщение, значит вы все уже настроили",
 		Check: True,
 	})
-	sprintVPN.AddStep(Step{
+	SprintVPN.AddStep(Step{
 		ID:    2,
 		Body:  fmt.Sprintf("Запустите команду '%s' для проверки этого спринта", prettyParam("cliga check --user [myname] sprint 1")),
 		Check: True,
 	})
 
 	// 2
-	sprintFS.AddStep(Step{
+	SprintFS.AddStep(Step{
 		ID:    1,
 		Body:  fmt.Sprintf("Создан скрипт '%s' и находится в директории '%s'", prettyParam("sprint1.sh"), prettyParam("/opt/sprint1/")),
 		Check: sprint1Step1,
 	})
-	sprintFS.AddStep(Step{
+	SprintFS.AddStep(Step{
 		ID: 2,
 		Body: fmt.Sprintf(`Скрипт умеет создавать следующую структуру и файл: '%s' 
 	- Проверка на наличие директорий и файлов`, prettyParam("/tmp/dir/subdir/file.txt")),
@@ -89,7 +89,7 @@ func SprintsInit() {
 	})
 
 	idx, sprint1SecretPart := getSecretSprint1()
-	sprintFS.AddStep(Step{
+	SprintFS.AddStep(Step{
 		ID: 3,
 		Body: fmt.Sprintf(`[%s %d/%d] Вы получили фрагмент сообщения: '%s'
 	- Найдены недостающие части у ваших коллег и выполнено условие сообщения`,

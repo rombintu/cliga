@@ -9,6 +9,7 @@ import (
 	"net/http"
 	urlc "net/url"
 	"os"
+	"strconv"
 
 	"github.com/rombintu/checker-sprints/internal/storage"
 	"github.com/urfave/cli/v2"
@@ -108,9 +109,9 @@ func (c *AgentCli) ActionPing(ctx *cli.Context) {
 func (c *AgentCli) ActionSprintGet(ctx *cli.Context, sprintNum string) {
 	switch sprintNum {
 	case "1", "one", "first", "vpn":
-		printSprint(sprintVPN)
+		printSprint(SprintVPN)
 	case "2", "two", "second", "fs":
-		printSprint(sprintFS)
+		printSprint(SprintFS)
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
@@ -132,9 +133,9 @@ func (c *AgentCli) ActionSprintCheck(ctx *cli.Context, sprintNum string) {
 	var s *Sprint
 	switch sprintNum {
 	case "1", "one", "first", "vpn":
-		s = sprintVPN
+		s = SprintVPN
 	case "2", "two", "second", "fs":
-		s = sprintFS
+		s = SprintFS
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
@@ -143,16 +144,16 @@ func (c *AgentCli) ActionSprintCheck(ctx *cli.Context, sprintNum string) {
 	for _, step := range s.Steps {
 		if !step.Check() {
 			stepsOK = false
-			printAgent(fmt.Sprintf("Taks [%d] in the Sprint [%d] are not solved", step.ID, s.ID))
+			printAgent(fmt.Sprintf("Taks [%d] not solved", step.ID))
 		}
 	}
 	if !stepsOK {
 		printAgentError("Some tasks are not solved, completion of the verification process", errNone, false)
 	}
 	printAgent(fmt.Sprintf("%sAll the tasks in the Sprint [%d] are solved!%s", ColorGreen, s.ID, ColorReset))
-	user.Sprints = []int64{s.ID}
 	url := NewUrl(ctx.String("server"))
 	url.addRoute("/users/sprint")
+	url.addQueryParam(strconv.FormatInt(s.ID, 10))
 	a, code, err := url.Post(user)
 	if err != nil {
 		printServerError(a, err, ctx.Bool("debug"))

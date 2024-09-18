@@ -29,100 +29,118 @@ type Meta struct {
 	Collections Collections
 }
 
-type mongodbDriver struct {
-	Client *mongo.Client
-	URI    string
-	Meta   Meta
+type MongodbDriver struct {
+	client   *mongo.Client
+	db       *mongo.Database
+	URI      string
+	Meta     Meta
+	location *time.Location
 }
 
-func NewMongoDBDriver(path string, database string) *mongodbDriver {
-	return &mongodbDriver{
+func NewMongoDBDriver(path string, database string) *MongodbDriver {
+	location, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		slog.Error(err.Error())
+	}
+	return &MongodbDriver{
 		URI: path,
 		Meta: Meta{ // TODO
-			Databases:   Databases{Main: database},
-			Collections: Collections{Sprints: defaultSprintsCollectionName},
+			Databases: Databases{Main: database},
+			Collections: Collections{
+				Sprints: defaultSprintsCollectionName,
+				Users:   defaultUsersCollectionName,
+			},
 		},
+		location: location,
 	}
 }
 
-func (d *mongodbDriver) Open(ctx context.Context) error {
+func (d *MongodbDriver) Open(ctx context.Context) error {
 	slog.Debug("try connect to database", slog.String("path", d.URI))
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(d.URI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(d.URI).SetMaxPoolSize(20))
 	if err != nil {
 		slog.Error("Failed to connect to MongoDB", slog.Any("error", err))
 	}
-	d.Client = client
+	d.client = client
+
+	d.SwitchDatabase(d.Meta.Databases.Main)
 	return nil
 }
 
-func (d *mongodbDriver) ConnSprints() *mongo.Collection {
-	return d.Client.Database(d.Meta.Databases.Main).Collection(d.Meta.Collections.Sprints)
+func (d *MongodbDriver) Close(ctx context.Context) error {
+	err := d.client.Disconnect(ctx)
+	if err != nil {
+		return err
+	}
+	d.client = nil
+	d.db = nil
+	return err
 }
 
-func (d *mongodbDriver) ConnUsers() *mongo.Collection {
-	return d.Client.Database(d.Meta.Databases.Main).Collection(d.Meta.Collections.Users)
+func (d *MongodbDriver) SwitchDatabase(name string) {
+	d.db = d.client.Database(name)
 }
 
-func (d *mongodbDriver) Close(ctx context.Context) error {
-	return d.Client.Disconnect(ctx)
+func (d *MongodbDriver) ConnSprints() *mongo.Collection {
+	return d.db.Collection(d.Meta.Collections.Sprints)
 }
 
-type row interface{}
+func (d *MongodbDriver) ConnUsers() *mongo.Collection {
+	return d.db.Collection(d.Meta.Collections.Users)
+}
 
-// func (d *mongodbDriver) FetchSprint(id int) (jsonData Sprint, err error) {
-// 	sprints := d.ConnSprints()
-// 	var result bson.M
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
-
-// 	err = sprints.FindOne(
-// 		ctx,
-// 		bson.M{"id": id},
-// 	).Decode(&result)
-// 	if err == mongo.ErrNoDocuments {
-// 		return jsonData, err
-// 	} else if err != nil {
-// 		return jsonData, err
-// 	}
-// 	binData, err := bson.Marshal(result)
-// 	if err != nil {
-// 		return jsonData, err
-// 	}
-// 	err = bson.Unmarshal(binData, &jsonData)
-// 	return jsonData, err
-// }
-
-func (d *mongodbDriver) UserFetch(login string) (User, error) {
+func (d *MongodbDriver) UserFetch(login string) (User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	d.Open(ctx)
-	defer d.Close(ctx)
 	filter := bson.M{"login": login}
 	users := d.ConnUsers()
 	var result User
 	if err := users.FindOne(
 		ctx, filter,
-	).Decode(result); err != nil {
+	).Decode(&result); err != nil {
 		return User{}, err
 	}
 	return result, nil
 }
 
-func (d *mongodbDriver) UserUpsert(user User) error {
+func (d *MongodbDriver) UserLogin(user User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	d.Open(ctx)
-	defer d.Close(ctx)
-	filter := bson.M{"login": user.Login}
-
-	opts := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)
 	users := d.ConnUsers()
+	now := time.Now()
+	user.CreatedAt = now
+	user.UpdatedAt = now
+	user.Sprints = []Sprint{}
 
-	users.FindOneAndUpdate(
+	users.InsertOne(
+		ctx,
+		user,
+	)
+	return nil
+}
+
+func (d *MongodbDriver) UserPushSprint(login string, sprint Sprint) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	filter := bson.M{"login": login}
+
+	opts := options.Update()
+	users := d.ConnUsers()
+	update := bson.M{
+		"$set": bson.M{
+			"updated_at": time.Now(),
+		},
+		"$push": bson.M{
+			"sprints": sprint,
+		},
+	}
+	if _, err := users.UpdateOne(
 		ctx,
 		filter,
-		bson.M{"$setOnInsert": user},
+		update,
 		opts,
-	)
+	); err != nil {
+		return err
+	}
 	return nil
 }
