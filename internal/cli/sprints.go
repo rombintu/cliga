@@ -77,24 +77,45 @@ func SprintsInit() {
 
 	// 2
 	SprintFS.AddStep(Step{
-		ID:    1,
+		ID: 1,
+		Body: fmt.Sprintf(`Созданы директории для хранения скриптов по спринтам 
+	- Имя: %sX - вместо X число спринта. Начиная с 1 до 7. В директории '%s' 
+	- Проверка на наличие директорий и файлов`,
+			prettyParam("sprint"),
+			prettyParam("/opt"),
+		),
+		Check: sprint1Step0,
+	})
+	SprintFS.AddStep(Step{
+		ID:    2,
 		Body:  fmt.Sprintf("Создан скрипт '%s' и находится в директории '%s'", prettyParam("sprint1.sh"), prettyParam("/opt/sprint1/")),
 		Check: sprint1Step1,
 	})
 	SprintFS.AddStep(Step{
-		ID: 2,
+		ID: 3,
 		Body: fmt.Sprintf(`Скрипт умеет создавать следующую структуру и файл: '%s' 
 	- Проверка на наличие директорий и файлов`, prettyParam("/tmp/dir/subdir/file.txt")),
 		Check: sprint1Step2,
 	})
 
+	SprintFS.AddStep(Step{
+		ID: 4,
+		Body: fmt.Sprintf(`Скрипт умеет создавать 99 директорий 
+	- Имя: %sX - вместо X число. Начиная с 1. В директории '%s' 
+	- Проверка на наличие директорий и файлов`,
+			prettyParam("gendir"),
+			prettyParam("/tmp"),
+		),
+		Check: sprint1Step3,
+	})
+
 	idx, sprint1SecretPart := getSecretSprint1()
 	SprintFS.AddStep(Step{
-		ID: 3,
+		ID: 5,
 		Body: fmt.Sprintf(`[%s %d/%d] Вы получили фрагмент сообщения: '%s'
 	- Найдены недостающие части у ваших коллег и выполнено условие сообщения`,
 			prettyTitle("Group"), idx, len(sprint1Secret1Parts),
 			prettyParam(sprint1SecretPart)),
-		Check: sprint1Step3,
+		Check: sprint1StepGroup,
 	})
 }

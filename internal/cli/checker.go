@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 	"strings"
 )
@@ -23,7 +24,22 @@ func fileExists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
-// Sprint 2. Step 1
+func dirNotExists(path string) bool {
+	f, err := os.Stat(path)
+	return os.IsNotExist(err) || !f.IsDir()
+}
+
+// Sprint 2
+func sprint1Step0() bool {
+	for i := 1; i < 8; i++ {
+		if dirNotExists(fmt.Sprintf("/opt/sprint%d", i)) {
+			return false
+		}
+	}
+	return true
+
+}
+
 func sprint1Step1() bool {
 	return fileExists("/opt/sprint1/sprint1.sh")
 }
@@ -34,6 +50,16 @@ func sprint1Step2() bool {
 }
 
 func sprint1Step3() bool {
+	for i := 1; i < 100; i++ {
+		if dirNotExists(fmt.Sprintf("/tmp/gendir%d", i)) {
+			return false
+		}
+	}
+	return true
+
+}
+
+func sprint1StepGroup() bool {
 	filePath := "/tmp/liga.txt"
 	if fileExists(filePath) {
 		b, err := os.ReadFile(filePath)
