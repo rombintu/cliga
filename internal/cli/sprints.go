@@ -228,4 +228,18 @@ func SprintsInit() {
 		Check: sprint4Step4,
 	})
 
+	SprintLVM.AddStep(Step{
+		ID: 5,
+		Body: fmt.Sprintf(`Групповое задание (*)
+	- Предоставьте права пользователю %s на %s
+	- Зайдите под пользователем %s на любую чужую ВМ
+	- Сохраните свой ключ ssh на чужой вм
+	- Скачайте файлы из %s к себе на ВМ`,
+			prettyParam("visiter"),
+			prettyParam("/mnt/lesson4/"),
+			prettyParam("visiter"),
+			prettyParam("/mnt/lesson4/"),
+		),
+		Check: constTrue,
+	})
 }
