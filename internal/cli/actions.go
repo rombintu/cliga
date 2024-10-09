@@ -112,6 +112,10 @@ func (c *AgentCli) ActionSprintGet(ctx *cli.Context, sprintNum string) {
 		printSprint(SprintVPN)
 	case "2", "two", "second", "fs":
 		printSprint(SprintFS)
+	case "3", "three":
+		printSprint(SprintGrep)
+	case "4":
+		printSprint(SprintLVM)
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
@@ -136,6 +140,10 @@ func (c *AgentCli) ActionSprintCheck(ctx *cli.Context, sprintNum string) {
 		s = SprintVPN
 	case "2", "two", "second", "fs":
 		s = SprintFS
+	case "3", "three":
+		s = SprintGrep
+	case "4":
+		s = SprintLVM
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
