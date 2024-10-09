@@ -194,11 +194,11 @@ func sprint3Step5() bool {
 }
 
 func sprint4Step1() bool {
-	return ExecAndFind("python3", []string{"-m", "pip", "show", "requests"}, "requests")
+	return ExecAndFindIsNotEmpty("python3", []string{"-m", "pip", "show", "requests"}, "requests")
 }
 
 func sprint4Step2() bool {
-	return ExecAndFind("lsblk", nil, "lv_lesson")
+	return ExecAndFindIsNotEmpty("lsblk", nil, "lv_lesson")
 }
 
 func sprint4Step3() bool {
