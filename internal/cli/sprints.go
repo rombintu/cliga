@@ -71,7 +71,7 @@ func SprintsInit() {
 	})
 	SprintVPN.AddStep(Step{
 		ID:    2,
-		Body:  fmt.Sprintf("Запустите команду '%s' для проверки этого спринта", prettyParam("cliga check --user [myname] sprint 1")),
+		Body:  fmt.Sprintf("Запустите команду '%s' для проверки этого спринта", prettyParam("cliga check --user [myname] 1")),
 		Check: constTrue,
 	})
 
