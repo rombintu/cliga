@@ -51,6 +51,13 @@ func printAgentError(text string, err error, debug bool) {
 	printExit()
 }
 
+func printAgentWarn(text string, err error, debug bool) {
+	printAgent(ColorYellow + text + ColorReset)
+	if debug {
+		slog.Error(err.Error())
+	}
+}
+
 func prettyTitle(text string) string {
 	return ColorYellow + text + ColorReset
 }

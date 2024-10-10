@@ -101,7 +101,7 @@ func ExecAndFind(c string, args []string, exists string) bool {
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			if exitErr.ExitCode() == 1 {
-				printAgentError(
+				printAgentWarn(
 					fmt.Sprintf(
 						"Команда %s %s выполнилась с ошибкой",
 						c, strings.Join(args, " "),
