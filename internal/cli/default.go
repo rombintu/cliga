@@ -48,6 +48,7 @@ func printAgentError(text string, err error, debug bool) {
 	if debug {
 		slog.Error(err.Error())
 	}
+	printExit()
 }
 
 func prettyTitle(text string) string {
