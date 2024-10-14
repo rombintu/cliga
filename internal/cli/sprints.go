@@ -62,6 +62,7 @@ var SprintVPN = NewSprint(1, "Настрока VPN")
 var SprintFS = NewSprint(2, "Базовое окружение и структура файловой системы Linux")
 var SprintGrep = NewSprint(3, "Обработка текста и SSH")
 var SprintLVM = NewSprint(4, "Работа с LVM, Файловые системы, Python для DevOps")
+var SprintDeamon = NewSprint(5, "Пакетные менеджеры и системы инициализации")
 
 func SprintsInit() {
 	SprintVPN.AddStep(Step{
@@ -239,6 +240,53 @@ func SprintsInit() {
 			prettyParam("/mnt/lesson4/"),
 			prettyParam("visiter"),
 			prettyParam("/mnt/lesson4/"),
+		),
+		Check: constTrue,
+	})
+
+	SprintDeamon.AddStep(Step{
+		ID: 1,
+		Body: fmt.Sprintf(`Сервис %s запущен`,
+			prettyParam("zabbix-agent"),
+		),
+		Check: sprint5Step1,
+	})
+
+	SprintDeamon.AddStep(Step{
+		ID: 2,
+		Body: fmt.Sprintf(`Zabbix-Agent. Параметры настроены:
+	- %s
+	- %s`,
+			prettyParam("Hostname"),
+			prettyParam("Server"),
+		),
+		Check: sprint5Step2,
+	})
+
+	SprintDeamon.AddStep(Step{
+		ID: 3,
+		Body: fmt.Sprintf(`Сервис %s запущен и в статусе %s`,
+			prettyParam("nginx"),
+			prettyParam("enabled"),
+		),
+		Check: sprint5Step3,
+	})
+
+	SprintDeamon.AddStep(Step{
+		ID: 4,
+		Body: fmt.Sprintf(`Сервис %s настроен на: 
+	- Рестарт после сбоя программы`,
+			prettyParam("nginx"),
+		),
+		Check: sprint5Step4,
+	})
+
+	SprintDeamon.AddStep(Step{
+		ID: 5,
+		Body: fmt.Sprintf(`Групповое задание (*)
+	- Договорись с коллегой или зайди на те ВМ которые уже заходил
+	- Сделай так, чтобы сервис %s не мог запуститься)))`,
+			prettyParam("nginx"),
 		),
 		Check: constTrue,
 	})

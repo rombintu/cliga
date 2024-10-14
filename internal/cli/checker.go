@@ -42,7 +42,7 @@ func dirNotExists(path string) bool {
 func hashFileIs(path string, hashFile string) bool {
 	file, err := os.Open(path)
 	if err != nil {
-		printAgentError("Ошибка при открытии файла", err, true)
+		// printAgentWarn("Ошибка при открытии файла", err, false)
 		return false
 	}
 	defer file.Close()
@@ -51,7 +51,7 @@ func hashFileIs(path string, hashFile string) bool {
 	hash := md5.New()
 
 	if _, err := io.Copy(hash, file); err != nil {
-		printAgentError("Ошибка при чтении файла", err, true)
+		// printAgentWarn("Ошибка при чтении файла", err, false)
 		return false
 	}
 	// Получаем хеш в виде байтового массива
@@ -60,17 +60,13 @@ func hashFileIs(path string, hashFile string) bool {
 	// Преобразуем хеш в строку в шестнадцатеричном формате
 	hashString := hex.EncodeToString(hashInBytes)
 
-	if hashString != hashFile {
-		printAgentError("Ошибка при проверке целостности файла", errNone, true)
-		return false
-	}
-	return true
+	return hashString == hashFile
 }
 
 func filePermission(path string, perm fs.FileMode) bool {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		printAgentError("Ошибка при получении информации о файле", errNone, true)
+		// printAgentError("Ошибка при получении информации о файле", errNone, true)
 		return false
 	}
 	mode := fileInfo.Mode()
@@ -92,7 +88,7 @@ func ExecAndFindIsNotEmpty(c string, args []string, exists string) bool {
 	if err != nil {
 		return false
 	}
-	return strings.Contains(string(output), exists)
+	return strings.Contains(strings.TrimSpace(string(output)), exists)
 }
 
 func ExecAndFind(c string, args []string, exists string) bool {
@@ -109,7 +105,7 @@ func ExecAndFind(c string, args []string, exists string) bool {
 				return false
 			}
 		}
-		printAgentError("Неизвестная ошибка", err, false)
+		printAgentWarn("Неизвестная ошибка", err, false)
 		return false
 	}
 	return strings.Contains(string(output), exists)
@@ -207,4 +203,22 @@ func sprint4Step3() bool {
 
 func sprint4Step4() bool {
 	return checkPortIsAvail("8080")
+}
+
+func sprint5Step1() bool {
+	return ExecAndFindIsNotEmpty("systemctl", []string{"is-active", "zabbix-agent"}, "active")
+}
+
+func sprint5Step2() bool {
+	return ExecAndFindIsNotEmpty("cat", []string{"/etc/zabbix_agentd.conf"}, "Hostname") &&
+		ExecAndFindIsNotEmpty("cat", []string{"/etc/zabbix_agentd.conf"}, "Server")
+}
+
+func sprint5Step3() bool {
+	return ExecAndFindIsNotEmpty("systemctl", []string{"is-active", "nginx"}, "active") &&
+		ExecAndFindIsNotEmpty("systemctl", []string{"is-enabled", "nginx"}, "enabled")
+}
+
+func sprint5Step4() bool {
+	return ExecAndFindIsNotEmpty("systemctl", []string{"show", "nginx"}, "Restart=on-failure")
 }

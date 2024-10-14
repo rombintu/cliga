@@ -116,6 +116,8 @@ func (c *AgentCli) ActionSprintGet(ctx *cli.Context, sprintNum string) {
 		printSprint(SprintGrep)
 	case "4":
 		printSprint(SprintLVM)
+	case "5":
+		printSprint(SprintDeamon)
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
@@ -144,6 +146,8 @@ func (c *AgentCli) ActionSprintCheck(ctx *cli.Context, sprintNum string) {
 		s = SprintGrep
 	case "4":
 		s = SprintLVM
+	case "5":
+		s = SprintDeamon
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
