@@ -44,7 +44,7 @@ func (s *Server) ConfigureStore() {
 
 func (s *Server) configureRouter() {
 	s.router.GET("/", s.pingHandler)
-	s.router.GET("/sprints/:num", s.sprintsHandler)
+	s.router.GET("/users/:username", s.userGetHandler)
 	s.router.POST("/users/sprint/:num", s.userSprintHandler)
 }
 

@@ -66,8 +66,8 @@ func (c *AgentCli) Init() {
 				printExit()
 				return nil
 			}
-			// TODO
-			// c.ActionUserGet(ctx, uuid)
+
+			c.ActionUserGet(ctx, uuid)
 			printExit()
 			return nil
 		},
@@ -98,7 +98,7 @@ func (c *AgentCli) Init() {
 				printExit()
 				return nil
 			}
-			// TODO
+
 			c.ActionSprintCheck(ctx, sprintNum)
 			printExit()
 			return nil
@@ -114,5 +114,14 @@ func (c *AgentCli) Init() {
 			return nil
 		},
 	}
-	c.Commands = append(c.Commands, &getCommand, &checkCommand, &pingCommand)
+
+	var versionCommand = cli.Command{
+		Name:  "version",
+		Usage: "Check version cli",
+		Action: func(ctx *cli.Context) error {
+			c.ActionGetVersion(ctx)
+			return nil
+		},
+	}
+	c.Commands = append(c.Commands, &getCommand, &checkCommand, &pingCommand, &versionCommand)
 }

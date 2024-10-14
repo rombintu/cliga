@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+
+	"github.com/urfave/cli/v2"
 )
 
 const addressAPI = "http://192.168.213.204:8080"
@@ -17,6 +19,11 @@ const (
 	ColorPurple = "\033[35m"
 	ColorCyan   = "\033[36m"
 )
+
+func (a *AgentCli) ActionGetVersion(ctx *cli.Context) {
+	printAgent(fmt.Sprintf("Stable: oct 14. %s", prettyTitle("5.1")))
+	printServer(fmt.Sprintf("Stable: oct 14. %s", prettyTitle("2.0")))
+}
 
 func printAgent(text string) {
 	fmt.Printf("["+ColorPurple+"Agent"+ColorReset+"]: %s\n", text)

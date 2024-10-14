@@ -174,3 +174,20 @@ func (c *AgentCli) ActionSprintCheck(ctx *cli.Context, sprintNum string) {
 	}
 	printServer(a)
 }
+
+func (c *AgentCli) ActionUserGet(ctx *cli.Context, username string) {
+	url := NewUrl(ctx.String("server"))
+	url.addRoute("/users")
+	url.addQueryParam(username)
+	payload, err := url.Get()
+	if err != nil {
+		printServerError(payload, err, true)
+	}
+	var user storage.User
+	if err := json.Unmarshal([]byte(payload), &user); err != nil {
+		printServerError(payload, err, true)
+	}
+	for spr := range user.Sprints {
+		printServer(fmt.Sprintf("Sprint %d - %s", spr+1, OK))
+	}
+}

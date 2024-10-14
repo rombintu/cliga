@@ -8,27 +8,12 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	cliga "github.com/rombintu/checker-sprints/internal/cli"
 	"github.com/rombintu/checker-sprints/internal/storage"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (s *Server) pingHandler(c echo.Context) error {
 	return c.String(http.StatusOK, "PONG!")
-}
-
-func (s *Server) sprintsHandler(c echo.Context) error {
-	num := c.Param("num")
-	var sprint *cliga.Sprint
-	switch num {
-	case "1":
-		sprint = cliga.SprintVPN
-	case "2":
-		sprint = cliga.SprintFS
-	default:
-		return c.String(http.StatusNotFound, "not found sprint")
-	}
-	return c.JSON(http.StatusOK, sprint)
 }
 
 func (s *Server) userSprintHandler(c echo.Context) error {
@@ -80,4 +65,17 @@ func (s *Server) userSprintHandler(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
 	return c.String(http.StatusOK, "updated")
+}
+
+func (s *Server) userGetHandler(c echo.Context) error {
+	username := c.Param("username")
+	if username == "" {
+		return c.String(http.StatusBadRequest, "username is empty")
+	}
+
+	user, err := s.store.UserFetch(username)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, user)
 }
