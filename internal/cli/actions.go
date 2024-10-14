@@ -181,11 +181,11 @@ func (c *AgentCli) ActionUserGet(ctx *cli.Context, username string) {
 	url.addQueryParam(username)
 	payload, err := url.Get()
 	if err != nil {
-		printServerError(payload, err, true)
+		printServerError(payload, err, false)
 	}
 	var user storage.User
 	if err := json.Unmarshal([]byte(payload), &user); err != nil {
-		printServerError(payload, err, true)
+		printServerError(payload, err, false)
 	}
 	for spr := range user.Sprints {
 		printServer(fmt.Sprintf("Sprint %d - %s", spr+1, OK))
