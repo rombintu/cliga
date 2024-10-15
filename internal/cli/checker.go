@@ -20,6 +20,7 @@ const (
 	OrigHASHfileTask1 string = "2d0d5ae879a784fd97e836867cfa0614"
 	HASHfileTask2     string = "1cbcf0d448fb645cabd3fcfffb6507b8"
 	HASHfileTask3     string = "1e8b315686070dfa270c7d9ca82404e8"
+	HASHfileTask3v2   string = "1617de7bc198f162e0b31fe41a8c9e74"
 )
 
 var sprint1Secret1Parts = []string{
@@ -173,7 +174,7 @@ func sprint3Step2() bool {
 }
 
 func sprint3Step3() bool {
-	return fileExists("/tmp/task1_sort.txt") && hashFileIs("/tmp/task1_sort.txt", HASHfileTask3)
+	return fileExists("/tmp/task1_sort.txt") && hashFileIs("/tmp/task1_sort.txt", HASHfileTask3) || hashFileIs("/tmp/task1_sort.txt", HASHfileTask3v2)
 }
 
 func sprint3Step4() bool {
