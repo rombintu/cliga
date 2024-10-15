@@ -21,7 +21,7 @@ const (
 )
 
 func (a *AgentCli) ActionGetVersion(ctx *cli.Context) {
-	printAgent(fmt.Sprintf("Stable: oct 14. %s", prettyTitle("5.1")))
+	printAgent(fmt.Sprintf("Stable: oct 15. %s", prettyTitle("5.2")))
 	printServer(fmt.Sprintf("Stable: oct 14. %s", prettyTitle("2.0")))
 }
 

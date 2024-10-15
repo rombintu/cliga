@@ -186,11 +186,11 @@ func sprint3Step4() bool {
 }
 
 func sprint3Step5() bool {
-	return userExists("tmpuser")
+	return userExists("visiter")
 }
 
 func sprint4Step1() bool {
-	return ExecAndFind("python3", []string{"-m", "pip", "show", "requests"}, "requests")
+	return ExecAndFindIsNotEmpty("python3", []string{"-m", "pip", "show", "requests"}, "requests")
 }
 
 func sprint4Step2() bool {
