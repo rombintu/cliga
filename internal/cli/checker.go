@@ -19,7 +19,7 @@ const (
 	sprint1Secret1Str string = "HELLO LIGA"
 	OrigHASHfileTask1 string = "2d0d5ae879a784fd97e836867cfa0614"
 	HASHfileTask2     string = "1cbcf0d448fb645cabd3fcfffb6507b8"
-	HASHfileTask3     string = "1617de7bc198f162e0b31fe41a8c9e74"
+	HASHfileTask3     string = "1e8b315686070dfa270c7d9ca82404e8"
 )
 
 var sprint1Secret1Parts = []string{
