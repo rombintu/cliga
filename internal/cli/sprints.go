@@ -63,6 +63,8 @@ var SprintFS = NewSprint(2, "Базовое окружение и структу
 var SprintGrep = NewSprint(3, "Обработка текста и SSH")
 var SprintLVM = NewSprint(4, "Работа с LVM, Файловые системы, Python для DevOps")
 var SprintDeamon = NewSprint(5, "Пакетные менеджеры и системы инициализации")
+var SprintVLAN = NewSprint(6, "Сетевая подсистема Linux")
+var SprintOps = NewSprint(7, "Базовая диагностика неисправностей и основы отказоустойчивых систем")
 
 func SprintsInit() {
 	SprintVPN.AddStep(Step{
@@ -113,7 +115,7 @@ func SprintsInit() {
 	idx, sprint1SecretPart := getSecretSprint1()
 	SprintFS.AddStep(Step{
 		ID: 5,
-		Body: fmt.Sprintf(`[%s %d/%d] Вы получили фрагмент сообщения: '%s'
+		Body: fmt.Sprintf(`[%s %s/%d] Вы получили фрагмент сообщения: '%s'
 	- Найдены недостающие части у ваших коллег и выполнено условие сообщения`,
 			prettyTitle("Group"), idx, len(sprint1Secret1Parts),
 			prettyParam(sprint1SecretPart)),
@@ -290,4 +292,78 @@ func SprintsInit() {
 		),
 		Check: constTrue,
 	})
+
+	SprintVLAN.AddStep(Step{
+		ID:    1,
+		Body:  fmt.Sprintf("%s существует", prettyParam("VLAN 500")),
+		Check: sprint6step1,
+	})
+
+	SprintVLAN.AddStep(Step{
+		ID: 2,
+		Body: fmt.Sprintf(`Групповое задание (*)
+	- С помощью %s запрети заходить по SSH на %s
+	- Удостоверься, что ВМ соседей пингуется по новому %s
+	- Попробуй зайти на ВМ соседей по новому %s`,
+			prettyParam("iptables"), prettyParam("VLAN 500"),
+			prettyParam("VLAN 500"), prettyParam("VLAN 500")),
+		Check: constTrue,
+	})
+
+	SprintOps.AddStep(Step{
+		ID:    1,
+		Body:  fmt.Sprintf("Существует файл %s", prettyParam("/var/log/messages-debug")),
+		Check: sprint7step1,
+	})
+
+	SprintOps.AddStep(Step{
+		ID:    2,
+		Body:  fmt.Sprintf("Запущена служба %s", prettyParam("rsyslog")),
+		Check: sprint7step2,
+	})
+
+	SprintOps.AddStep(Step{
+		ID: 3,
+		Body: fmt.Sprintf(`Существует тестовое сообщение %s
+	- Проверка в файле: %s`, prettyParam("This is a debug message"), prettyParam("/var/log/messages-debug")),
+		Check: sprint7step3,
+	})
+
+	SprintOps.AddStep(Step{
+		ID:    4,
+		Body:  fmt.Sprintf("Установлена и запущена служба %s", prettyParam("Keepalived")),
+		Check: sprint7step4,
+	})
+
+	SprintOps.AddStep(Step{
+		ID: 5,
+		Body: fmt.Sprintf(`Файл конфигурации существует 
+	- %s`, prettyParam("/etc/keepalived/keepalived.conf")),
+		Check: sprint7step5,
+	})
+
+	SprintOps.AddStep(Step{
+		ID: 6,
+		Body: fmt.Sprintf(`Установлены и запущены сервисы: 
+	- %s
+	- %s`,
+			prettyParam("haproxy"), prettyParam("nginx")),
+		Check: sprint7step6,
+	})
+
+	SprintOps.AddStep(Step{
+		ID: 7,
+		Body: fmt.Sprintf(`Существуют сертификат и ключ
+	- %s
+	- %s`,
+			prettyParam("/etc/ssl/nginx/nginx.crt"), prettyParam("/etc/ssl/nginx/nginx.key")),
+		Check: sprint7step7,
+	})
+
+	SprintOps.AddStep(Step{
+		ID:    8,
+		Body:  "Выполнить групповое задание из презентации (*)",
+		Check: constTrue,
+	})
+
 }

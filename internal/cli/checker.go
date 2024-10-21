@@ -166,15 +166,19 @@ func sprint1StepGroup() bool {
 }
 
 func sprint3Step1() bool {
-	return fileExists("/tmp/task1.txt") && hashFileIs("/tmp/task1.txt", OrigHASHfileTask1)
+	return fileExists("/tmp/task1.txt") &&
+		hashFileIs("/tmp/task1.txt", OrigHASHfileTask1)
 }
 
 func sprint3Step2() bool {
-	return fileExists("/tmp/task1_sed.txt") && hashFileIs("/tmp/task1_sed.txt", HASHfileTask2)
+	return fileExists("/tmp/task1_sed.txt") &&
+		hashFileIs("/tmp/task1_sed.txt", HASHfileTask2)
 }
 
 func sprint3Step3() bool {
-	return fileExists("/tmp/task1_sort.txt") && hashFileIs("/tmp/task1_sort.txt", HASHfileTask3) || hashFileIs("/tmp/task1_sort.txt", HASHfileTask3v2)
+	return fileExists("/tmp/task1_sort.txt") &&
+		hashFileIs("/tmp/task1_sort.txt", HASHfileTask3) ||
+		hashFileIs("/tmp/task1_sort.txt", HASHfileTask3v2)
 }
 
 func sprint3Step4() bool {
@@ -191,7 +195,8 @@ func sprint3Step5() bool {
 }
 
 func sprint4Step1() bool {
-	return ExecAndFindIsNotEmpty("python3", []string{"-m", "pip", "show", "requests"}, "requests")
+	return ExecAndFindIsNotEmpty("python3",
+		[]string{"-m", "pip", "show", "requests"}, "requests")
 }
 
 func sprint4Step2() bool {
@@ -199,7 +204,8 @@ func sprint4Step2() bool {
 }
 
 func sprint4Step3() bool {
-	return ExecAndFindIsNotEmpty("findmnt", []string{"/mnt/lesson4"}, "/mnt/lesson4")
+	return ExecAndFindIsNotEmpty("findmnt",
+		[]string{"/mnt/lesson4"}, "/mnt/lesson4")
 }
 
 func sprint4Step4() bool {
@@ -207,19 +213,64 @@ func sprint4Step4() bool {
 }
 
 func sprint5Step1() bool {
-	return ExecAndFindIsNotEmpty("systemctl", []string{"is-active", "zabbix-agent"}, "active")
+	return ExecAndFindIsNotEmpty("systemctl",
+		[]string{"is-active", "zabbix-agent"}, "active")
 }
 
 func sprint5Step2() bool {
-	return ExecAndFindIsNotEmpty("cat", []string{"/etc/zabbix_agentd.conf"}, "Hostname") &&
-		ExecAndFindIsNotEmpty("cat", []string{"/etc/zabbix_agentd.conf"}, "Server")
+	return ExecAndFindIsNotEmpty("cat",
+		[]string{"/etc/zabbix/zabbix_agentd.conf"}, "Hostname") &&
+		ExecAndFindIsNotEmpty("cat",
+			[]string{"/etc/zabbix/zabbix_agentd.conf"}, "Server")
 }
 
 func sprint5Step3() bool {
-	return ExecAndFindIsNotEmpty("systemctl", []string{"is-active", "nginx"}, "active") &&
-		ExecAndFindIsNotEmpty("systemctl", []string{"is-enabled", "nginx"}, "enabled")
+	return ExecAndFindIsNotEmpty("systemctl",
+		[]string{"is-active", "nginx"}, "active") &&
+		ExecAndFindIsNotEmpty("systemctl",
+			[]string{"is-enabled", "nginx"}, "enabled")
 }
 
 func sprint5Step4() bool {
-	return ExecAndFindIsNotEmpty("systemctl", []string{"show", "nginx"}, "Restart=on-failure")
+	return ExecAndFindIsNotEmpty("systemctl",
+		[]string{"show", "nginx"}, "Restart=on-failure")
+}
+
+func sprint6step1() bool {
+	return ExecAndFindIsNotEmpty("ip", []string{"link", "show"}, "500")
+}
+
+func sprint7step1() bool {
+	return fileExists("/var/log/messages-debug")
+}
+
+func sprint7step2() bool {
+	return ExecAndFindIsNotEmpty("systemctl",
+		[]string{"is-active", "rsyslog"}, "active")
+}
+
+func sprint7step3() bool {
+	return ExecAndFindIsNotEmpty("cat",
+		[]string{"/var/log/messages-debug"}, "This is a debug message")
+}
+
+func sprint7step4() bool {
+	return ExecAndFindIsNotEmpty("systemctl",
+		[]string{"is-active", "keepalived"}, "active")
+}
+
+func sprint7step5() bool {
+	return fileExists("/etc/keepalived/keepalived.conf")
+}
+
+func sprint7step6() bool {
+	return ExecAndFindIsNotEmpty("systemctl",
+		[]string{"is-active", "haproxy"}, "active") &&
+		ExecAndFindIsNotEmpty("systemctl",
+			[]string{"is-active", "nginx"}, "active")
+}
+
+func sprint7step7() bool {
+	return fileExists("/etc/ssl/nginx/nginx.crt") &&
+		fileExists("/etc/ssl/nginx/nginx.key")
 }

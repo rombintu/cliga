@@ -118,6 +118,10 @@ func (c *AgentCli) ActionSprintGet(ctx *cli.Context, sprintNum string) {
 		printSprint(SprintLVM)
 	case "5":
 		printSprint(SprintDeamon)
+	case "6":
+		printSprint(SprintVLAN)
+	case "7":
+		printSprint(SprintOps)
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
@@ -148,6 +152,10 @@ func (c *AgentCli) ActionSprintCheck(ctx *cli.Context, sprintNum string) {
 		s = SprintLVM
 	case "5":
 		s = SprintDeamon
+	case "6":
+		s = SprintVLAN
+	case "7":
+		s = SprintOps
 	default:
 		printAgentError(fmt.Sprintf("Sprint [%s] not found", sprintNum), errNone, false)
 	}
