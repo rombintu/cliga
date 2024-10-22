@@ -194,7 +194,9 @@ func (c *AgentCli) ActionUserGet(ctx *cli.Context, username string) {
 	if err := json.Unmarshal([]byte(payload), &user); err != nil {
 		printServerError(payload, err, false)
 	}
-	for spr := range user.Sprints {
-		printServer(fmt.Sprintf("Sprint %d - %s", spr+1, OK))
+	layout := "2006-01-02 15:04:05"
+	for _, spr := range user.Sprints {
+		formattedTime := spr.UpdatedAt.Format(layout)
+		printServer(fmt.Sprintf("Sprint %d - %s | %s", spr.ID, formattedTime, OK))
 	}
 }
