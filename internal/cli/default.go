@@ -9,7 +9,7 @@ import (
 )
 
 // Законстантил TODO засунуть в конфиг
-const addressAPI = "http://192.168.213.204:8080"
+const addressAPI = "http://192.168.213.87:8080"
 
 const (
 	ColorReset  = "\033[0m"
@@ -22,7 +22,7 @@ const (
 )
 
 func (a *AgentCli) ActionGetVersion(ctx *cli.Context) {
-	printAgent(fmt.Sprintf("Stable: oct 21. %s", prettyTitle("7.0")))
+	printAgent(fmt.Sprintf("Stable: oct 21. %s", prettyTitle("7.1")))
 	printServer(fmt.Sprintf("Stable: oct 14. %s", prettyTitle("2.1")))
 }
 

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	urlc "net/url"
 	"os"
 	"strconv"
 
@@ -35,13 +34,13 @@ func (u *Url) addRoute(route string) {
 	u.path = u.path + route
 }
 
-func (u *Url) addParams(params map[string]string) {
-	query := urlc.Values{}
-	for k, v := range params {
-		query.Add(k, v)
-	}
-	u.path = fmt.Sprintf("%s?%s", u.path, query.Encode())
-}
+// func (u *Url) addParams(params map[string]string) {
+// 	query := urlc.Values{}
+// 	for k, v := range params {
+// 		query.Add(k, v)
+// 	}
+// 	u.path = fmt.Sprintf("%s?%s", u.path, query.Encode())
+// }
 
 func (u *Url) addQueryParam(param string) {
 	u.path = u.path + "/" + param

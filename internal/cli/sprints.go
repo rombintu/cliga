@@ -304,9 +304,11 @@ func SprintsInit() {
 		Body: fmt.Sprintf(`Групповое задание (*)
 	- С помощью %s запрети заходить по SSH на %s
 	- Удостоверься, что ВМ соседей пингуется по новому %s
-	- Попробуй зайти на ВМ соседей по новому %s`,
+	- Попробуй зайти на ВМ соседей по новому %s
+	- Если зашел, удали %s и его конфигурационные файлы`,
 			prettyParam("iptables"), prettyParam("VLAN 500"),
-			prettyParam("VLAN 500"), prettyParam("VLAN 500")),
+			prettyParam("VLAN 500"), prettyParam("VLAN 500"),
+			prettyParam("VLAN 500")),
 		Check: constTrue,
 	})
 
